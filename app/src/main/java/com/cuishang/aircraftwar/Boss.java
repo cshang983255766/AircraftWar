@@ -13,38 +13,36 @@ import android.graphics.Paint;
  *
  */
 public class Boss {
-	//Boss��Ѫ��
+
 	public int hp = 50;
-	//Boss��ͼƬ��Դ
+
 	private Bitmap bmpBoss;
-	//Boss����
+
 	public int x, y;
-	//Bossÿ֡�Ŀ��
+
 	public int frameW, frameH;
-	//Boss��ǰ֡�±�
+
 	private int frameIndex;
-	//Boss�˶����ٶ�
+
 	private int speed = 5;
-	//Boss���˶��켣
-	//һ��ʱ���������Ļ�·��˶������ҷ����Χ�ӵ������Ƿ��̬��
-	//����״̬�� ���ӵ���ֱ�����˶�
+
 	private boolean isCrazy;
-	//������״̬��״̬ʱ����
+
 	private int crazyTime = 200;
-	//������
+
 	private int count;
 
-	//Boss�Ĺ��캯��
+
 	public Boss(Bitmap bmpBoss) {
 		this.bmpBoss = bmpBoss;
 		frameW = bmpBoss.getWidth() / 10;
 		frameH = bmpBoss.getHeight();
-		//Boss��X�������
+
 		x = MySurfaceView.screenW / 2 - frameW / 2;
 		y = 0;
 	}
 
-	//Boss�Ļ���
+
 	public void draw(Canvas canvas, Paint paint) {
 		canvas.save();
 		canvas.clipRect(x, y, x + frameW, y + frameH);
@@ -52,14 +50,14 @@ public class Boss {
 		canvas.restore();
 	}
 
-	//Boss���߼�
+
 	public void logic() {
-		//����ѭ������֡�γɶ���
+
 		frameIndex++;
 		if (frameIndex >= 10) {
 			frameIndex = 0;
 		}
-		//û�з���״̬
+
 		if (isCrazy == false) {
 			x += speed;
 			if (x + frameW >= MySurfaceView.screenW) {
@@ -72,12 +70,12 @@ public class Boss {
 				isCrazy = true;
 				speed = 24;
 			}
-			//����״̬
+
 		} else {
 			speed -= 1;
-			//��Boss����ʱ���������ӵ�
+
 			if (speed == 0) {
-				//���8�����ӵ�
+
 				MySurfaceView.vcBulletBoss.add(new Bullet(MySurfaceView.bmpBossBullet, x+40, y+10, Bullet.BULLET_BOSS, Bullet.DIR_UP));
 				MySurfaceView.vcBulletBoss.add(new Bullet(MySurfaceView.bmpBossBullet, x+40, y+10, Bullet.BULLET_BOSS, Bullet.DIR_DOWN));
 				MySurfaceView.vcBulletBoss.add(new Bullet(MySurfaceView.bmpBossBullet, x+40, y+10, Bullet.BULLET_BOSS, Bullet.DIR_LEFT));
@@ -89,14 +87,14 @@ public class Boss {
 			}
 			y += speed;
 			if (y <= 0) {
-				//�ָ�����״̬
+
 				isCrazy = false;
 				speed = 5;
 			}
 		}
 	}
 
-	//�ж���ײ(Boss�������ӵ�����)
+
 	public boolean isCollsionWith(Bullet bullet) {
 		int x2 = bullet.bulletX;
 		int y2 = bullet.bulletY;
@@ -114,7 +112,7 @@ public class Boss {
 		return true;
 	}
 
-	//����BossѪ��
+
 	public void setHp(int hp) {
 		this.hp = hp;
 	}

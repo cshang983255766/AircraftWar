@@ -27,8 +27,8 @@ public class Player {
 
 	private boolean isCollision;
 
-	private int PlayerCurrX ;
-	private int PlayerCurrY ;
+	public int PlayerCurrX ;
+	public int PlayerCurrY ;
 
 
 	public Player(Bitmap bmpPlayer, Bitmap bmpPlayerHp) {
@@ -36,8 +36,6 @@ public class Player {
 		this.bmpPlayerHp = bmpPlayerHp;
 		PlayerCurrX = MySurfaceView.screenW/2;
 		PlayerCurrY = MySurfaceView.screenH - bmpPlayer.getHeight()/2;
-		x = MySurfaceView.screenW / 2 - bmpPlayer.getWidth() / 2;
-		y = MySurfaceView.screenH - bmpPlayer.getHeight();
 	}
 
 	public void GamingOnTouch(MotionEvent event) {

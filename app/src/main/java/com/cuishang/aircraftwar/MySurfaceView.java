@@ -48,9 +48,11 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
     private Bitmap bmpPlayer;
     private Bitmap bmpPlayerHp;
     private Bitmap bmpMenu;
+    private Bitmap bmpRestart;
     public static Bitmap bmpBullet;
     public static Bitmap bmpEnemyBullet;
     public static Bitmap bmpBossBullet;
+
     private Resources res = this.getResources();
     private Vector<Enemy> vcEnemy;
     public static Vector<Bullet> vcBulletBoss;
@@ -60,22 +62,21 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
     private int createEnemyTime = 50;
     private int enemyArray[][] = { { 1, 2 }, { 1, 1 }, { 1, 3, 1, 2 }, { 1, 2 }, { 2, 3 }, { 3, 1, 3 }, { 2, 2 }, { 1, 2 }, { 2, 2 }, { 1, 3, 1, 1 }, { 2, 1 },
             { 1, 3 }, { 2, 1 }, { -1 } };
-    //µ±Ç°È¡³öÒ»Î¬Êý×éµÄÏÂ±ê
+
     private int enemyArrayIndex;
-    //ÊÇ·ñ³öÏÖBoss±êÊ¶Î»
-    //Ëæ»ú¿â£¬Îª´´½¨µÄµÐ»ú¸³ÓèËæ¼´×ø±ê
+
     private Random random;
-    //µÐ»ú×Óµ¯ÈÝÆ÷
+
     private Vector<Bullet> vcBullet;
-    //Ìí¼Ó×Óµ¯µÄ¼ÆÊýÆ÷
+
     private int countEnemyBullet;
-    //Ö÷½Ç×Óµ¯ÈÝÆ÷
+
     private Vector<Bullet> vcBulletPlayer;
-    //Ìí¼Ó×Óµ¯µÄ¼ÆÊýÆ÷
+
     private int countPlayerBullet;
-    //±¬Õ¨Ð§¹ûÈÝÆ÷
+
     private Vector<Boom> vcBoom;
-    //ÉùÃ÷Boss
+
     private Boss boss;
 
     public MySurfaceView(Context context) {
@@ -139,10 +140,11 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
                     case GAME_PAUSE:
                         break;
                     case GAME_WIN:
-                        canvas.drawBitmap(bmpGameWin, 0, 0, paint);
+                        gameMenu.draw(canvas, paint);
+
                         break;
                     case GAME_LOST:
-                        canvas.drawBitmap(bmpGameLost, 0, 0, paint);
+                        gameMenu.draw(canvas, paint);
                         break;
                 }
             }
@@ -155,77 +157,76 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
     }
 
     private void logic() {
-        //Âß¼­´¦Àí¸ù¾ÝÓÎÏ·×´Ì¬²»Í¬½øÐÐ²»Í¬´¦Àí
+
         switch (gameState) {
             case GAME_MENU:
                 break;
             case GAMEING:
-                //±³¾°Âß¼­
+
                 backGround.logic();
-                //Ö÷½ÇÂß¼­
+
                 player.logic();
-                //µÐ»úÂß¼­
+
                 if (isBoss == false) {
-                    //µÐ»úÂß¼­
+
                     for (int i = 0; i < vcEnemy.size(); i++) {
                         Enemy en = vcEnemy.elementAt(i);
-                        //ÒòÎªÈÝÆ÷²»¶ÏÌí¼ÓµÐ»ú £¬ÄÇÃ´¶ÔµÐ»úisDeadÅÐ¶¨£¬
-                        //Èç¹ûÒÑËÀÍöÄÇÃ´¾Í´ÓÈÝÆ÷ÖÐÉ¾³ý,¶ÔÈÝÆ÷Æðµ½ÁËÓÅ»¯×÷ÓÃ£»
+
                         if (en.isDead) {
                             vcEnemy.removeElementAt(i);
                         } else {
                             en.logic();
                         }
                     }
-                    //Éú³ÉµÐ»ú
+
                     count++;
                     if (count % createEnemyTime == 0) {
                         for (int i = 0; i < enemyArray[enemyArrayIndex].length; i++) {
-                            //²ÔÓ¬
+
                             if (enemyArray[enemyArrayIndex][i] == 1) {
                                 int x = random.nextInt(screenW - 100) + 50;
                                 vcEnemy.addElement(new Enemy(bmpEnemyFly, 1, x, -50));
-                                //Ñ¼×Ó×ó
+
                             } else if (enemyArray[enemyArrayIndex][i] == 2) {
                                 int y = random.nextInt(20);
                                 vcEnemy.addElement(new Enemy(bmpEnemyDuck, 2, -50, y));
-                                //Ñ¼×ÓÓÒ
+
                             } else if (enemyArray[enemyArrayIndex][i] == 3) {
                                 int y = random.nextInt(20);
                                 vcEnemy.addElement(new Enemy(bmpEnemyDuck, 3, screenW + 50, y));
                             }
                         }
-                        //ÕâÀïÅÐ¶ÏÏÂÒ»×éÊÇ·ñÎª×îºóÒ»×é(Boss)
+
                         if (enemyArrayIndex == enemyArray.length - 1) {
                             isBoss = true;
                         } else {
                             enemyArrayIndex++;
                         }
                     }
-                    //´¦ÀíµÐ»úÓëÖ÷½ÇµÄÅö×²
+
                     for (int i = 0; i < vcEnemy.size(); i++) {
                         if (player.isCollsionWith(vcEnemy.elementAt(i))) {
-                            //·¢ÉúÅö×²£¬Ö÷½ÇÑªÁ¿-1
+
                             player.setPlayerHp(player.getPlayerHp() - 1);
-                            //µ±Ö÷½ÇÑªÁ¿Ð¡ÓÚ0£¬ÅÐ¶¨ÓÎÏ·Ê§°Ü
+
                             if (player.getPlayerHp() <= -1) {
                                 gameState = GAME_LOST;
                             }
                         }
                     }
-                    //Ã¿2ÃëÌí¼ÓÒ»¸öµÐ»ú×Óµ¯
+
                     countEnemyBullet++;
                     if (countEnemyBullet % 40 == 0) {
                         for (int i = 0; i < vcEnemy.size(); i++) {
                             Enemy en = vcEnemy.elementAt(i);
-                            //²»Í¬ÀàÐÍµÐ»ú²»Í¬µÄ×Óµ¯ÔËÐÐ¹ì¼£
+
                             int bulletType = 0;
                             switch (en.type) {
-                                //²ÔÓ¬
+
                                 case Enemy.TYPE_FLY:
                                     bulletType = Bullet.BULLET_FLY;
                                     break;
-                                //Ñ¼×Ó
+
                                 case Enemy.TYPE_DUCKL:
                                 case Enemy.TYPE_DUCKR:
                                     bulletType = Bullet.BULLET_DUCK;
@@ -234,7 +235,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
                             vcBullet.add(new Bullet(bmpEnemyBullet, en.x + 10, en.y + 20, bulletType));
                         }
                     }
-                    //´¦ÀíµÐ»ú×Óµ¯Âß¼­
+
                     for (int i = 0; i < vcBullet.size(); i++) {
                         Bullet b = vcBullet.elementAt(i);
                         if (b.isDead) {
@@ -243,34 +244,32 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
                             b.logic();
                         }
                     }
-                    //´¦ÀíµÐ»ú×Óµ¯ÓëÖ÷½ÇÅö×²
+
                     for (int i = 0; i < vcBullet.size(); i++) {
                         if (player.isCollsionWith(vcBullet.elementAt(i))) {
-                            //·¢ÉúÅö×²£¬Ö÷½ÇÑªÁ¿-1
+
                             player.setPlayerHp(player.getPlayerHp() - 1);
-                            //µ±Ö÷½ÇÑªÁ¿Ð¡ÓÚ0£¬ÅÐ¶¨ÓÎÏ·Ê§°Ü
+
                             if (player.getPlayerHp() <= -1) {
                                 gameState = GAME_LOST;
                             }
                         }
                     }
-                    //´¦ÀíÖ÷½Ç×Óµ¯ÓëµÐ»úÅö×²
+
                     for (int i = 0; i < vcBulletPlayer.size(); i++) {
-                        //È¡³öÖ÷½Ç×Óµ¯ÈÝÆ÷µÄÃ¿¸öÔªËØ
+
                         Bullet blPlayer = vcBulletPlayer.elementAt(i);
                         for (int j = 0; j < vcEnemy.size(); j++) {
-                            //Ìí¼Ó±¬Õ¨Ð§¹û
-                            //È¡³öµÐ»úÈÝÆ÷µÄÃ¿¸öÔªÓëÖ÷½Ç×Óµ¯±éÀúÅÐ¶Ï
+
                             if (vcEnemy.elementAt(j).isCollsionWith(blPlayer)) {
                                 vcBoom.add(new Boom(bmpBoom, vcEnemy.elementAt(j).x, vcEnemy.elementAt(j).y, 7));
                             }
                         }
                     }
-                } else {//BossÏà¹ØÂß¼­
-                    //Ã¿0.5ÃëÌí¼ÓÒ»¸öÖ÷½Ç×Óµ¯
+                } else {
                     boss.logic();
                     if (countPlayerBullet % 10 == 0) {
-                        //BossµÄÃ»·¢·èÖ®Ç°µÄÆÕÍ¨×Óµ¯
+
                         vcBulletBoss.add(new Bullet(bmpBossBullet, boss.x + 35, boss.y + 40, Bullet.BULLET_FLY));
                     }
                     //Boss×Óµ¯Âß¼­
@@ -316,7 +315,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
                 //Ã¿1ÃëÌí¼ÓÒ»¸öÖ÷½Ç×Óµ¯
                 countPlayerBullet++;
                 if (countPlayerBullet % 20 == 0) {
-                    vcBulletPlayer.add(new Bullet(bmpBullet, player.x + 15, player.y - 20, Bullet.BULLET_PLAYER));
+                    vcBulletPlayer.add(new Bullet(bmpBullet, player.PlayerCurrX + 15, player.PlayerCurrY - 20, Bullet.BULLET_PLAYER));
                 }
                 //´¦ÀíÖ÷½Ç×Óµ¯Âß¼­
                 for (int i = 0; i < vcBulletPlayer.size(); i++) {
@@ -341,8 +340,12 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
             case GAME_PAUSE:
                 break;
             case GAME_WIN:
+                initGame();
+                System.out.println("cuishang initGame chushihualeeeeee");
                 break;
             case GAME_LOST:
+                initGame();
+                System.out.println("cuishang initGame chushihualeeeeee");
                 break;
 
         }
@@ -404,15 +407,15 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
             case GAME_PAUSE:
                 break;
             case GAME_WIN:
+                gameMenu.onTouchEvent(event);
                 break;
             case GAME_LOST:
-
+                gameMenu.onTouchEvent(event);
                 break;
         }
         return true;
     }
     private void initGame() {
-        if (gameState == GAME_MENU) {
             bmpBackGround = BitmapFactory.decodeResource(res, R.drawable.background);
             bmpBoom = BitmapFactory.decodeResource(res, R.drawable.boom);
             bmpBoosBoom = BitmapFactory.decodeResource(res, R.drawable.boos_boom);
@@ -429,6 +432,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
             bmpBullet = BitmapFactory.decodeResource(res, R.drawable.bullet);
             bmpEnemyBullet = BitmapFactory.decodeResource(res, R.drawable.bullet_enemy);
             bmpBossBullet = BitmapFactory.decodeResource(res, R.drawable.boosbullet);
+            bmpRestart = BitmapFactory.decodeResource(res, R.drawable.restart);
 
             vcBoom = new Vector<Boom>();
 
@@ -436,7 +440,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 
             vcBulletPlayer = new Vector<Bullet>();
 
-            gameMenu = new GameMenu(bmpMenu, bmpButton, bmpButtonPress);
+            gameMenu = new GameMenu(bmpMenu, bmpButton, bmpButtonPress, bmpGameWin, bmpGameLost, bmpRestart);
 
             backGround = new GameBg(bmpBackGround);
 
@@ -449,6 +453,5 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
             boss = new Boss(bmpEnemyBoos);
 
             vcBulletBoss = new Vector<Bullet>();
-        }
     }
 }
